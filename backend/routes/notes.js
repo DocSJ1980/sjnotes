@@ -23,6 +23,7 @@ router.post("/addnotes", fetchuser,
     ],
     //Creating asyinc function for implementing the route
     async (req, res) => {
+        //Implementing try/catch block to avoid any errors or unexpected behaviour
         try {
             //Put inputs to req.body
             const { title, description, tag } = req.body;
@@ -51,31 +52,69 @@ router.post("/addnotes", fetchuser,
     }
 );
 
-//THIRD ROUTE: Update an existing note using : Post "/api/notes/updatenotes" Login required
+//THIRD ROUTE: Update an existing note using : PUT "/api/notes/updatenote" Login required
+//Creating end point with post request and implementing login required through middleware
 router.put("/updatenote/:id", fetchuser,
     //Creating asyinc function for implementing the route
     async (req, res) => {
         //Put inputs to req.body
         const { title, description, tag } = req.body;
-        
-        //Create new note object
-        const newNote = {};
-        if(title){newNote.title = title};
-        if(description){newNote.description = description};
-        if(tag){newNote.tag = tag};
-        
-        //Find the note to be updated and store
-        let note = await Notes.findById(req.params.id);
-        
-        //Check if note belongs to logged in user and check if no note found
-        if (!note){return res.status(404).send("Not Found")}
-        if (note.user.toString() !== req.user.id){
-            return res.status(401).send("Not Allowed");
+        //Implementing try/catch block to avoid any errors or unexpected behaviour
+        try {
+            //Create new note object
+            const newNote = {};
+            if(title){newNote.title = title};
+            if(description){newNote.description = description};
+            if(tag){newNote.tag = tag};
+            
+            //Find the note to be updated and store
+            let note = await Notes.findById(req.params.id);
+            
+            //Check if note belongs to logged in user and check if no note found
+            if (!note){return res.status(404).send("Not Found")}
+            if (note.user.toString() !== req.user.id){
+                return res.status(401).send("Not Allowed");
+            }
+            
+            //if above condtions found true then update the note and return in response 
+            note = await Notes.findByIdAndUpdate(req.params.id, {$set: newNote}, {new:true})
+            res.json({note});
+        } 
+        //Try statement completed, now catching errors if above not successful.
+        catch (error) {
+            console.error(error.message);
+            res.status(500).send("Internal Server Error");
         }
-        
-        //if above condtions found true then update the note and return in response 
-        note = await Notes.findByIdAndUpdate(req.params.id, {$set: newNote}, {new:true})
-        res.json({note});
     }
 )
+//FOURTH ROUTE: Update an existing note using : DELETE "/api/notes/deletenote" Login required
+//Creating end point with post request and implementing login required through middleware
+router.delete("/deletenote/:id", fetchuser,
+    //Creating asyinc function for implementing the route
+    async (req, res) => {
+        
+        //Implementing try/catch block to avoid any errors or unexpected behaviour
+        try {
+        //Find the note to be deleted and store & throw error if no note found
+            let note = await Notes.findById(req.params.id);
+            if (!note){return res.status(404).send("Not Found")}
+        
+            //Allow deletion if logged-in user owns this note and check if no note found
+            if (note.user.toString() !== req.user.id){
+                return res.status(401).send("Not Allowed");
+            }
+            
+            //if above condtions found true then update the note and return in response 
+            note = await Notes.findByIdAndDelete(req.params.id)
+            res.json({"Success": "Note has been deleted", note: note});
+        } 
+        //Try statement completed, now catching errors if above not successful.
+        catch (error) {
+            console.error(error.message);
+            res.status(500).send("Internal Server Error");
+        }
+    }
+)
+
+
 module.exports = router
