@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import noteContext from "./noteContext";
 
 const NoteState = (props) =>{
@@ -56,7 +56,8 @@ const NoteState = (props) =>{
             "tag": "personal",
             "date": "2022-06-26T13:15:41.393Z",
             "__v": 0
-          },{
+          },
+          {
             "_id": "62b85bdf7427053f95a5d9e3",
             "user": "62b35aa7eb7cc2tefae311e2",
             "title": "My Note",
@@ -73,7 +74,8 @@ const NoteState = (props) =>{
             "tag": "personal",
             "date": "2022-06-26T13:15:41.393Z",
             "__v": 0
-          },{
+          },
+          {
             "_id": "62b85bdf7427053f95a5d9w3",
             "user": "62b35aa7eb7cc2fefae311e2",
             "title": "My Note",
@@ -90,12 +92,39 @@ const NoteState = (props) =>{
             "tag": "personal",
             "date": "2022-06-26T13:15:41.393Z",
             "__v": 0
-          }
+          },
     ]
     const [notes, setNotes] = useState(notesInitial);
-    return (
-        <noteContext.Provider value={{notes, setNotes}}>
-            {props.children}
+    //Add a note
+    const addNote = (title, description, tag)=>{
+      //TODO API Call
+      console.log("Adding a note")
+      const note ={
+            "_id": "62b85bfd7427053f95p5d9e5",
+            "user": "62b35aa7eb7cc2fefae311e2",
+            "title": title,
+            "description": description,
+            "tag": tag,
+            "date": "2022-06-26T13:15:41.393Z",
+            "__v": 0 
+      };
+      setNotes(notes.concat(note));
+    }
+// Delete a Note
+const deleteNote = (id)=>{
+  //TODO API Call
+  console.log("Deleting note with ID: " +id);
+  const newNotes = notes.filter((note)=>{return note._id!==id});
+  setNotes(newNotes);
+}
+// Edit a Note
+const editNote = ()=>{
+
+}
+
+return (
+  <noteContext.Provider value={{notes, addNote,deleteNote, editNote }}>
+        {props.children}
         </noteContext.Provider>
     )
 }
