@@ -1,11 +1,12 @@
 import React, {useEffect} from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = (props) => {
   let navigate= useNavigate();
-    const handleLogout =()=>{
+    const handleLogout = () =>{
     localStorage.removeItem('token');
     navigate('/login');
+    props.showAlert ("Logged out successfully", "success");
   }
   const location = useLocation();
   useEffect(()=>{
